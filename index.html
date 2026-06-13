@@ -196,26 +196,15 @@
   </div>
 </div>
 
-<!-- S5 NOITE -->
+<!-- S5 CONFIRMACAO (sem hotel) -->
 <div class="screen" id="screen5">
-  <h1 class="headline" style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:.3rem">E o finalzinho? 🌙</h1>
-  <p class="subtitle" style="margin-bottom:1.5rem">porque a noite pode ser ainda mais especial...</p>
-  <div class="night-grid">
-    <div class="night-card" onclick="selectNight(this,'🏨 Motel')"><span class="night-emoji">🏨</span><div class="night-name">Ir pro Motel</div><div class="night-desc">Jacuzzi, serviço de quarto e a gente dois 🔥</div></div>
-    <div class="night-card" onclick="selectNight(this,'🏙️ AP Airbnb')"><span class="night-emoji">🏙️</span><div class="night-name">Alugar um AP</div><div class="night-desc">Vista da cidade, cozinha e a vibe certa 🌆</div></div>
-  </div>
-</div>
-
-<!-- S6 FINAL -->
-<div class="screen" id="screen6">
-  <div style="font-size:3.5rem;margin-bottom:1rem">🥂</div>
+  <div style="font-size:4rem;margin-bottom:1rem">🥂</div>
   <h1 class="headline" style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:.3rem">Tá marcado! 💖</h1>
   <div class="divider"></div>
   <div class="final-card">
-    <div class="summary-row"><span class="summary-label">📅 Data</span><span class="summary-value" id="sum-date">—</span></div>
-    <div class="summary-row"><span class="summary-label">🕐 Horário</span><span class="summary-value" id="sum-time">—</span></div>
-    <div class="summary-row"><span class="summary-label">📍 Lugar</span><span class="summary-value" id="sum-place">—</span></div>
-    <div class="summary-row"><span class="summary-label">🌙 Depois</span><span class="summary-value" id="sum-night">—</span></div>
+    <div class="summary-row"><span class="summary-label">📅 Data</span><span class="summary-value" id="sum-date2">—</span></div>
+    <div class="summary-row"><span class="summary-label">🕐 Horário</span><span class="summary-value" id="sum-time2">—</span></div>
+    <div class="summary-row"><span class="summary-label">📍 Lugar</span><span class="summary-value" id="sum-place2">—</span></div>
     <p style="font-size:.9rem;color:rgba(255,255,255,.45);text-align:center;margin-top:1.5rem;line-height:1.6">Mal posso esperar por essa noite contigo ✨<br><span style="color:var(--rose-light);font-style:italic">— com carinho 🌹</span></p>
     <div style="text-align:center">
       <button class="btn-whatsapp" onclick="enviarWhatsApp()">
@@ -225,6 +214,7 @@
     </div>
   </div>
 </div>
+
 
 <script>
 const IMG='https://image.tmdb.org/t/p/w300';
@@ -267,7 +257,7 @@ const filmesEmBreve=[
   {nome:'A Odisseia',           poster:null,                                   age:'?',  tag:'',         estreia:'16/07',gen:['Aventura']},
 ];
 
-let cur=1,total=6,selDate=null,selTime=null,selPlace=null,selFilme=null,selNight=null;
+let cur=1,total=5,selDate=null,selTime=null,selPlace=null,selFilme=null,selNight=null;
 let cTab='cartaz',cFilter='Todos',calY=new Date().getFullYear(),calM=new Date().getMonth();
 const hoje=new Date();
 const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -285,7 +275,7 @@ function nextScreen(n){
   document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen4b').classList.remove('active');
   cur=n;document.getElementById('screen'+n).classList.add('active');renderDots();
-  if(n===3)renderCal();if(n===6)renderSum();
+  if(n===3)renderCal();if(n===5)renderSum2();
 }
 
 function runAway(id){
@@ -353,8 +343,14 @@ function renderCinema(){
 }
 function confirmFilme(){if(!selFilme){alert('Escolhe um filme! 🎬');return}selPlace='🎬 Cinema – '+selFilme;document.getElementById('screen4b').classList.remove('active');cur=5;document.getElementById('screen5').classList.add('active');renderDots()}
 
-function selectNight(el,n){document.querySelectorAll('.night-card').forEach(c=>{c.style.borderColor='';c.style.background=''});el.style.borderColor='var(--rose)';el.style.background='rgba(232,50,90,.2)';selNight=n;confetti();setTimeout(()=>nextScreen(6),900)}
+function selectNight(el,n){document.querySelectorAll('.night-card').forEach(c=>{c.style.borderColor='';c.style.background=''});el.style.borderColor='var(--rose)';el.style.background='rgba(232,50,90,.2)';selNight=n;confetti();setTimeout(()=>nextScreen(5),500)}
 
+function renderSum2(){
+  document.getElementById('sum-date2').textContent=selDate||'—';
+  document.getElementById('sum-time2').textContent=selTime||'—';
+  document.getElementById('sum-place2').textContent=selPlace||'—';
+  confetti();
+}
 function renderSum(){
   document.getElementById('sum-date').textContent=selDate||'—';
   document.getElementById('sum-time').textContent=selTime||'—';
