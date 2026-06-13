@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💖 Tenho uma pergunta...</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--rose:#E8325A;--rose-light:#FF6B8A;--rose-dark:#B01E40;--cream:#FFF8F0;--dark:#1A0A10}
+  html,body{height:100%;font-family:'Lato',sans-serif;background:var(--dark);overflow:hidden}
+  #particles{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .particle{position:absolute;animation:floatUp linear infinite;opacity:0}
+  @keyframes floatUp{0%{opacity:0;transform:translateY(0) rotate(0deg)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(-100vh) rotate(360deg)}}
+  .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;opacity:0;pointer-events:none;transition:opacity .7s;padding:2rem}
+  .screen.active{opacity:1;pointer-events:all}
+  .screen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 60% 40%,#3D0A1E 0%,#1A0A10 60%,#0D0609 100%);z-index:-1}
+  .headline{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,6vw,4.5rem);color:var(--cream);text-align:center;line-height:1.2;margin-bottom:.5rem;text-shadow:0 0 40px rgba(232,50,90,.4)}
+  .headline em{font-style:italic;color:var(--rose-light)}
+  .subtitle{font-weight:300;font-size:clamp(1rem,2.5vw,1.4rem);color:rgba(255,255,255,.55);text-align:center;margin-bottom:3rem;letter-spacing:.05em}
+  .divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--rose),transparent);margin:1rem auto 2rem}
+  .btn-group{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;align-items:center}
+  .btn{padding:1rem 2.8rem;border:none;border-radius:60px;font-family:'Lato',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.08em;cursor:pointer}
+  .btn-yes{background:linear-gradient(135deg,var(--rose) 0%,var(--rose-dark) 100%);color:#fff;box-shadow:0 8px 30px rgba(232,50,90,.5);transition:transform .15s,box-shadow .15s}
+  .btn-yes:hover{transform:scale(1.06);box-shadow:0 12px 40px rgba(232,50,90,.7)}
+  .btn-no{background:transparent;color:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.2);transition:none}
+  .btn-no.flying{position:fixed;z-index:9999}
+  .heart-big{font-size:5rem;margin-bottom:1.5rem;animation:heartbeat 1.4s ease-in-out infinite}
+  @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.2)}28%{transform:scale(1)}42%{transform:scale(1.15)}}
+  /* CALENDAR */
+  .calendar-wrap{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:2rem;backdrop-filter:blur(10px);max-width:420px;width:100%}
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+  .cal-header h3{font-family:'Playfair Display',serif;color:var(--cream);font-size:1.2rem}
+  .cal-nav{background:none;border:none;color:var(--rose-light);font-size:1.4rem;cursor:pointer;padding:0 .5rem}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:1.5rem}
+  .cal-day-label{text-align:center;font-size:.7rem;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.05em;padding-bottom:4px}
+  .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:.85rem;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
+  .cal-day:hover:not(.empty):not(.past){background:rgba(232,50,90,.3);color:#fff}
+  .cal-day.selected{background:var(--rose);color:#fff;box-shadow:0 4px 16px rgba(232,50,90,.6);font-weight:700}
+  .cal-day.today{border:1px solid var(--rose-light);color:var(--rose-light)}
+  .cal-day.past{opacity:.25;cursor:not-allowed}
+  .cal-day.empty{cursor:default}
+  .time-row{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.5rem}
+  .time-chip{padding:.5rem 1.2rem;border-radius:30px;border:1.5px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:.85rem;cursor:pointer;transition:all .2s}
+  .time-chip:hover{border-color:var(--rose-light);color:var(--rose-light)}
+  .time-chip.selected{background:var(--rose);border-color:var(--rose);color:#fff;box-shadow:0 4px 14px rgba(232,50,90,.5)}
+  /* LUGARES */
+  .places-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;max-width:640px;width:100%}
+  .place-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:20px;padding:1.4rem 1rem;text-align:center;cursor:pointer;transition:all .25s;backdrop-filter:blur(8px)}
+  .place-card:hover{border-color:var(--rose-light);background:rgba(232,50,90,.12);transform:translateY(-4px)}
+  .place-card.selected{border-color:var(--rose);background:rgba(232,50,90,.22);box-shadow:0 8px 24px rgba(232,50,90,.4)}
+  .place-emoji{font-size:2.4rem;display:block;margin-bottom:.6rem}
+  .place-name{font-size:.88rem;font-weight:700;color:var(--cream);margin-bottom:.3rem}
+  .place-hint{font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.4}
+  /* CINEMA */
+  .cinema-screen{position:fixed;inset:0;z-index:10;opacity:0;pointer-events:none;transition:opacity .7s;background:#0d0d18;display:flex;flex-direction:column}
+  .cinema-screen.active{opacity:1;pointer-events:all}
+  .cinema-header{padding:1rem 1rem 0;background:#0d0d18;flex-shrink:0}
+  .cinema-header-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+  .cinema-back{background:none;border:none;color:var(--rose-light);font-size:1.5rem;cursor:pointer;line-height:1;padding:0 .3rem 0 0}
+  .cinema-title{font-family:'Playfair Display',serif;color:var(--cream);font-size:1.15rem}
+  .cinema-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:.7rem}
+  .cinema-tab{flex:1;text-align:center;padding:.55rem 0;font-size:.85rem;font-weight:700;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'Lato',sans-serif}
+  .cinema-tab.active{color:var(--rose-light);border-bottom-color:var(--rose-light)}
+  .cinema-filters{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:.6rem;scrollbar-width:none}
+  .cinema-filters::-webkit-scrollbar{display:none}
+  .filter-chip{flex-shrink:0;padding:.28rem .85rem;border-radius:30px;border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(255,255,255,.55);font-size:.72rem;cursor:pointer;transition:all .18s;font-family:'Lato',sans-serif}
+  .filter-chip.active{background:var(--rose);border-color:var(--rose);color:#fff}
+  .cinema-list{flex:1;overflow-y:auto;padding:.8rem .8rem 6rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;align-content:start}
+  .cinema-list::-webkit-scrollbar{width:3px}
+  .cinema-list::-webkit-scrollbar-thumb{background:rgba(232,50,90,.3);border-radius:2px}
+  .movie-card{cursor:pointer;border-radius:10px;overflow:hidden;background:#1a1a2e;border:2px solid transparent;transition:border-color .2s,transform .2s}
+  .movie-card:hover{border-color:rgba(255,107,138,.6);transform:scale(1.03)}
+  .movie-card.selected{border-color:var(--rose);box-shadow:0 0 18px rgba(232,50,90,.6)}
+  .movie-poster-wrap{position:relative;width:100%;aspect-ratio:2/3;overflow:hidden;background:#111127}
+  .movie-poster-img{width:100%;height:100%;object-fit:cover;display:block}
+  .movie-poster-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;padding:.4rem;background:linear-gradient(160deg,#1a1a3e,#0d0d18)}
+  .movie-poster-fallback span{font-size:1.8rem}
+  .movie-poster-fallback p{font-size:.58rem;color:rgba(255,255,255,.6);text-align:center;line-height:1.3}
+  .movie-age{position:absolute;top:4px;left:4px;font-size:.58rem;font-weight:900;padding:2px 5px;border-radius:4px;z-index:2}
+  .age-L{background:#27AE60;color:#fff}.age-12{background:#F5A623;color:#000}.age-14{background:#E8A032;color:#000}.age-16{background:#E05A1A;color:#fff}.age-18{background:#E8325A;color:#fff}.age-Q{background:#555;color:#fff}
+  .movie-tag{position:absolute;bottom:0;left:0;right:0;font-size:.55rem;font-weight:900;text-align:center;padding:3px;z-index:2;letter-spacing:.04em}
+  .tag-prevenda{background:var(--rose);color:#fff}.tag-estreia{background:rgba(0,0,0,.72);color:rgba(255,255,255,.85)}
+  .movie-info{padding:.35rem .4rem .5rem}
+  .movie-name{font-size:.68rem;color:var(--cream);font-weight:600;line-height:1.3}
+  .cinema-footer{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(to top,#0d0d18 55%,transparent);padding:.8rem 1rem 1rem;display:flex;align-items:center;gap:.8rem;z-index:20}
+  .sel-film-info{flex:1}
+  .sel-film-label{font-size:.7rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.15rem}
+  .sel-film-name{font-size:.85rem;color:var(--rose-light);font-weight:700}
+  /* NOITE */
+  .night-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:520px;width:100%}
+  .night-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:24px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s}
+  .night-card:hover{border-color:var(--rose-light);background:rgba(232,50,90,.12);transform:translateY(-6px);box-shadow:0 16px 40px rgba(232,50,90,.3)}
+  .night-emoji{font-size:3.5rem;display:block;margin-bottom:1rem}
+  .night-name{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--cream);margin-bottom:.5rem}
+  .night-desc{font-size:.8rem;color:rgba(255,255,255,.4);line-height:1.5}
+  /* FINAL */
+  .final-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:2.5rem 2rem;max-width:480px;width:100%;text-align:center;backdrop-filter:blur(14px)}
+  .summary-row{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+  .summary-row:last-child{border:none}
+  .summary-label{font-size:.8rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em}
+  .summary-value{font-size:.9rem;color:var(--cream);font-weight:600;max-width:60%;text-align:right}
+  .btn-whatsapp{display:inline-flex;align-items:center;gap:.6rem;background:#25D366;color:#fff;padding:1rem 2.2rem;border-radius:60px;font-family:'Lato',sans-serif;font-size:1rem;font-weight:700;margin-top:1.5rem;box-shadow:0 8px 24px rgba(37,211,102,.4);transition:transform .15s,box-shadow .15s;border:none;cursor:pointer}
+  .btn-whatsapp:hover{transform:scale(1.05);box-shadow:0 12px 32px rgba(37,211,102,.6)}
+  .confetti-piece{position:fixed;border-radius:2px;animation:confettiFall linear forwards;z-index:9999;pointer-events:none}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+  .step-hint{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:20}
+  .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s}
+  .dot.active{background:var(--rose)}
+</style>
+</head>
+<body>
+<div id="particles"></div>
+<div class="step-hint" id="stepDots"></div>
+
+<!-- S1 -->
+<div class="screen active" id="screen1">
+  <div class="heart-big">💖</div>
+  <h1 class="headline">Quer <em>sair comigo</em>?</h1>
+  <p class="subtitle">pode ser a melhor decisão da sua vida ✨</p>
+  <div class="btn-group">
+    <button class="btn btn-yes" onclick="nextScreen(2)">💗 Sim!</button>
+    <button class="btn btn-no" id="no-btn" onmouseenter="runAway('no-btn')" ontouchstart="runAway('no-btn');return false;">Não</button>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="screen" id="screen2">
+  <div class="heart-big">🥺</div>
+  <h1 class="headline">Tem <em>certeza?</em></h1>
+  <div class="divider"></div>
+  <p class="subtitle">porque eu já estou animado demais com isso...</p>
+  <div class="btn-group">
+    <button class="btn btn-yes" onclick="nextScreen(3)">💗 Com certeza!</button>
+    <button class="btn btn-no" id="no-btn2" onmouseenter="runAway('no-btn2')" ontouchstart="runAway('no-btn2');return false;">Hmm, não sei</button>
+  </div>
+</div>
+
+<!-- S3 CALENDÁRIO -->
+<div class="screen" id="screen3">
+  <h1 class="headline" style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:.3rem">Quando você quer ir? 🗓️</h1>
+  <p class="subtitle" style="margin-bottom:1.5rem">escolhe o dia e o horário</p>
+  <div class="calendar-wrap">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+      <h3 id="cal-month-label"></h3>
+      <button class="cal-nav" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <p style="font-size:.8rem;color:rgba(255,255,255,.35);text-align:center;margin-bottom:1rem;letter-spacing:.06em;text-transform:uppercase">Horário</p>
+    <div class="time-row">
+      <button class="time-chip" onclick="selectTime(this,'18:00')">18:00</button>
+      <button class="time-chip" onclick="selectTime(this,'19:00')">19:00</button>
+      <button class="time-chip" onclick="selectTime(this,'19:30')">19:30</button>
+      <button class="time-chip" onclick="selectTime(this,'20:00')">20:00</button>
+      <button class="time-chip" onclick="selectTime(this,'21:00')">21:00</button>
+    </div>
+    <button class="btn btn-yes" style="width:100%" onclick="goToPlaces()">Próximo 💫</button>
+  </div>
+</div>
+
+<!-- S4 LUGARES -->
+<div class="screen" id="screen4">
+  <h1 class="headline" style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:.3rem">Onde a gente vai? 🌆</h1>
+  <p class="subtitle" style="margin-bottom:1.5rem">escolhe o rolê da noite</p>
+  <div class="places-grid">
+    <div class="place-card" onclick="selectPlace(this,'🍣 Japonês')"><span class="place-emoji">🍣</span><div class="place-name">Japonês</div><div class="place-hint">Sushi, temaki & boa conversa</div></div>
+    <div class="place-card" onclick="selectPlace(this,'🍝 Italiano')"><span class="place-emoji">🍝</span><div class="place-name">Italiano</div><div class="place-hint">Macarrão, vinho e romance</div></div>
+    <div class="place-card" onclick="selectPlaceCinema(this)"><span class="place-emoji">🎬</span><div class="place-name">Cinema</div><div class="place-hint">Escolha o filme! 🍿</div></div>
+    <div class="place-card" onclick="selectPlace(this,'🥩 Outback')"><span class="place-emoji">🥩</span><div class="place-name">Outback</div><div class="place-hint">Bloomin' Onion pra dois</div></div>
+    <div class="place-card" onclick="selectPlace(this,'🌃 Bar no Terraço')"><span class="place-emoji">🌃</span><div class="place-name">Bar no Terraço</div><div class="place-hint">Vista de SP à noite ✨</div></div>
+    <div class="place-card" onclick="selectPlace(this,'🍸 Coquetelaria SP')"><span class="place-emoji">🍸</span><div class="place-name">Coquetelaria</div><div class="place-hint">Drinks autorais em SP</div></div>
+  </div>
+</div>
+
+<!-- S4B CINEMA -->
+<div class="cinema-screen" id="screen4b">
+  <div class="cinema-header">
+    <div class="cinema-header-top">
+      <button class="cinema-back" onclick="backToPlaces()">←</button>
+      <span class="cinema-title">🎬 Filmes em Cartaz – Suzano</span>
+    </div>
+    <div class="cinema-tabs">
+      <button class="cinema-tab active" id="tab-cartaz" onclick="switchTab('cartaz')">Em Cartaz</button>
+      <button class="cinema-tab" id="tab-breve" onclick="switchTab('breve')">Em Breve</button>
+    </div>
+    <div class="cinema-filters" id="cinema-filters"></div>
+  </div>
+  <div class="cinema-list" id="cinema-list"></div>
+  <div class="cinema-footer">
+    <div class="sel-film-info">
+      <span class="sel-film-label">Filme escolhido</span>
+      <span class="sel-film-name" id="sel-film-name">nenhum ainda…</span>
+    </div>
+    <button class="btn btn-yes" style="padding:.75rem 1.4rem;font-size:.9rem;white-space:nowrap" onclick="confirmFilme()">Confirmar 💫</button>
+  </div>
+</div>
+
+<!-- S5 NOITE -->
+<div class="screen" id="screen5">
+  <h1 class="headline" style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:.3rem">E o finalzinho? 🌙</h1>
+  <p class="subtitle" style="margin-bottom:1.5rem">porque a noite pode ser ainda mais especial...</p>
+  <div class="night-grid">
+    <div class="night-card" onclick="selectNight(this,'🏨 Motel')"><span class="night-emoji">🏨</span><div class="night-name">Ir pro Motel</div><div class="night-desc">Jacuzzi, serviço de quarto e a gente dois 🔥</div></div>
+    <div class="night-card" onclick="selectNight(this,'🏙️ AP Airbnb')"><span class="night-emoji">🏙️</span><div class="night-name">Alugar um AP</div><div class="night-desc">Vista da cidade, cozinha e a vibe certa 🌆</div></div>
+  </div>
+</div>
+
+<!-- S6 FINAL -->
+<div class="screen" id="screen6">
+  <div style="font-size:3.5rem;margin-bottom:1rem">🥂</div>
+  <h1 class="headline" style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:.3rem">Tá marcado! 💖</h1>
+  <div class="divider"></div>
+  <div class="final-card">
+    <div class="summary-row"><span class="summary-label">📅 Data</span><span class="summary-value" id="sum-date">—</span></div>
+    <div class="summary-row"><span class="summary-label">🕐 Horário</span><span class="summary-value" id="sum-time">—</span></div>
+    <div class="summary-row"><span class="summary-label">📍 Lugar</span><span class="summary-value" id="sum-place">—</span></div>
+    <div class="summary-row"><span class="summary-label">🌙 Depois</span><span class="summary-value" id="sum-night">—</span></div>
+    <p style="font-size:.9rem;color:rgba(255,255,255,.45);text-align:center;margin-top:1.5rem;line-height:1.6">Mal posso esperar por essa noite contigo ✨<br><span style="color:var(--rose-light);font-style:italic">— com carinho 🌹</span></p>
+    <div style="text-align:center">
+      <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Confirmar pelo WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const IMG='https://image.tmdb.org/t/p/w300';
+
+// FILMES com poster_path confirmados via TMDB
+const filmesCartaz=[
+  {nome:'Supergirl',            poster:IMG+'/lJVug1z4VFIEAEopgiCxZy2yOzX.jpg', age:'?',  tag:'PRÉ-VENDA',estreia:'23/06',gen:['Aventura','Fantasia']},
+  {nome:'Backrooms: Um Não-Lugar',poster:null,                                  age:'16', tag:'',         estreia:'',    gen:['Terror']},
+  {nome:'BTS World Tour Arirang', poster:null,                                  age:'?',  tag:'PRÉ-VENDA',estreia:'13/06',gen:['Show']},
+  {nome:'Michael',              poster:IMG+'/dueFqKLvjftnELZaGYwY7xinfaI.jpg', age:'12', tag:'',         estreia:'',    gen:['Drama','Musical']},
+  {nome:'O Diabo Veste Prada 2',poster:IMG+'/50yWyY981TyUHhoxxSEKwO70FmQ.jpg', age:'12', tag:'',         estreia:'',    gen:['Comédia']},
+  {nome:'Obsessão',             poster:null,                                   age:'18', tag:'',         estreia:'',    gen:['Drama']},
+  {nome:'Crepúsculo: Eclipse',  poster:IMG+'/a8qPjwfKA1MwjEoVPhTf1ptVzdE.jpg', age:'14', tag:'',         estreia:'',    gen:['Romance']},
+  {nome:'Trago Seu Amor',       poster:null,                                   age:'12', tag:'',         estreia:'',    gen:['Romance']},
+  {nome:'Dia D',                poster:null,                                   age:'12', tag:'',         estreia:'',    gen:['Aventura']},
+  {nome:'Todo Mundo em Pânico', poster:null,                                   age:'18', tag:'',         estreia:'',    gen:['Comédia','Terror']},
+  {nome:'Minions & Monstros',   poster:IMG+'/iq8ZhE81WmPRIXqc6f7FjeGCN2s.jpg', age:'L',  tag:'PRÉ-VENDA',estreia:'01/07',gen:['Animação']},
+  {nome:'Mestres do Universo',  poster:null,                                   age:'14', tag:'',         estreia:'',    gen:['Aventura','Fantasia']},
+  {nome:'Hit Para Dois',        poster:IMG+'/9UDXiDRwsKt1G9pSVeXqNdzPAVm.jpg', age:'16', tag:'',         estreia:'',    gen:['Comédia']},
+  {nome:'Toy Story 5',          poster:IMG+'/dlZR5AE2NfKeZYxCKAvLGKSjncS.jpg', age:'L',  tag:'PRÉ-VENDA',estreia:'17/06',gen:['Animação']},
+];
+const filmesEmBreve=[
+  {nome:'Toy Story 5',          poster:IMG+'/dlZR5AE2NfKeZYxCKAvLGKSjncS.jpg', age:'L',  tag:'PRÉ-VENDA',estreia:'17/06',gen:['Animação']},
+  {nome:'A Vida A Parte',       poster:null,                                   age:'14', tag:'PRÉ-VENDA',estreia:'18/06',gen:['Drama']},
+  {nome:'Apenas Coisas Boas',   poster:null,                                   age:'18', tag:'',         estreia:'25/06',gen:['Drama']},
+  {nome:'O Sol Nasce P/ Todos', poster:null,                                   age:'16', tag:'',         estreia:'25/06',gen:['Drama']},
+  {nome:'Segredo Obscuro',      poster:null,                                   age:'16', tag:'',         estreia:'25/06',gen:['Terror']},
+  {nome:'Um Triste Belo Mundo', poster:null,                                   age:'?',  tag:'PRÉ-VENDA',estreia:'25/06',gen:['Drama']},
+  {nome:'Uma Infância Alemã',   poster:null,                                   age:'14', tag:'',         estreia:'25/06',gen:['Drama']},
+  {nome:'Anatomia Do Caos',     poster:null,                                   age:'?',  tag:'',         estreia:'02/07',gen:['Drama']},
+  {nome:'Franz',                poster:null,                                   age:'12', tag:'',         estreia:'02/07',gen:['Drama']},
+  {nome:'Salvação',             poster:null,                                   age:'?',  tag:'PRÉ-VENDA',estreia:'02/07',gen:['Ação']},
+  {nome:'A Divina Sarah B.',    poster:null,                                   age:'?',  tag:'',         estreia:'09/07',gen:['Drama']},
+  {nome:'A Morte do Demônio',   poster:null,                                   age:'?',  tag:'',         estreia:'09/07',gen:['Terror']},
+  {nome:'Herança De Narcisa',   poster:null,                                   age:'14', tag:'',         estreia:'09/07',gen:['Drama']},
+  {nome:'Moana',                poster:null,                                   age:'L',  tag:'',         estreia:'09/07',gen:['Animação']},
+  {nome:'O Convite',            poster:null,                                   age:'?',  tag:'',         estreia:'09/07',gen:['Drama']},
+  {nome:'Os Emergentes',        poster:null,                                   age:'?',  tag:'',         estreia:'09/07',gen:['Comédia']},
+  {nome:'Primavera',            poster:null,                                   age:'?',  tag:'',         estreia:'09/07',gen:['Drama']},
+  {nome:'A Odisseia',           poster:null,                                   age:'?',  tag:'',         estreia:'16/07',gen:['Aventura']},
+];
+
+let cur=1,total=6,selDate=null,selTime=null,selPlace=null,selFilme=null,selNight=null;
+let cTab='cartaz',cFilter='Todos',calY=new Date().getFullYear(),calM=new Date().getMonth();
+const hoje=new Date();
+const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const dias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const emjs=['🌹','💖','✨','💫','🌸','💝','🥂','🌙','⭐'];
+
+function mkPart(){const p=document.createElement('span');p.className='particle';p.textContent=emjs[~~(Math.random()*emjs.length)];p.style.left=Math.random()*100+'vw';p.style.animationDuration=(6+Math.random()*8)+'s';p.style.animationDelay=(Math.random()*6)+'s';p.style.fontSize=(0.8+Math.random()*1.2)+'rem';document.getElementById('particles').appendChild(p);setTimeout(()=>p.remove(),14000)}
+setInterval(mkPart,600);for(let i=0;i<8;i++)mkPart();
+
+function renderDots(){const c=document.getElementById('stepDots');c.innerHTML='';for(let i=1;i<=total;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':'');c.appendChild(d)}}
+renderDots();
+
+function nextScreen(n){
+  resetNo('no-btn');resetNo('no-btn2');
+  document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen4b').classList.remove('active');
+  cur=n;document.getElementById('screen'+n).classList.add('active');renderDots();
+  if(n===3)renderCal();if(n===6)renderSum();
+}
+
+function runAway(id){
+  const b=document.getElementById(id);
+  if(!b.classList.contains('flying')){const r=b.getBoundingClientRect();b.style.top=r.top+'px';b.style.left=r.left+'px';b.style.width=r.width+'px';b.style.height=r.height+'px';b.classList.add('flying')}
+  const vw=window.innerWidth,vh=window.innerHeight,bw=b.offsetWidth||100,bh=b.offsetHeight||48,m=20;
+  let x,y,t=0;
+  do{x=m+Math.random()*(vw-bw-m*2);y=m+Math.random()*(vh-bh-m*2);t++;
+    if(t>30||!(Math.abs(x+bw/2-vw/2)<vw*.3&&Math.abs(y+bh/2-vh/2)<vh*.25))break}while(true);
+  b.style.left=x+'px';b.style.top=y+'px';
+}
+function resetNo(id){const b=document.getElementById(id);if(!b)return;b.classList.remove('flying');b.style.position=b.style.left=b.style.top=b.style.width=b.style.height=''}
+
+function renderCal(){
+  document.getElementById('cal-month-label').textContent=meses[calM]+' '+calY;
+  const g=document.getElementById('cal-grid');g.innerHTML='';
+  dias.forEach(d=>{const l=document.createElement('div');l.className='cal-day-label';l.textContent=d;g.appendChild(l)});
+  const fd=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate();
+  for(let i=0;i<fd;i++){const e=document.createElement('div');e.className='cal-day empty';g.appendChild(e)}
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(calY,calM,d);
+    const ip=dt<new Date(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+    const it=dt.toDateString()===hoje.toDateString();
+    const ds=dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long'});
+    const b=document.createElement('div');b.className='cal-day'+(ip?' past':'')+(it?' today':'');
+    if(selDate===ds)b.classList.add('selected');b.textContent=d;if(!ip)b.onclick=()=>{document.querySelectorAll('.cal-day').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selDate=ds};g.appendChild(b);
+  }
+}
+function changeMonth(d){calM+=d;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}renderCal()}
+function selectTime(el,t){document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selTime=t}
+function goToPlaces(){if(!selDate){alert('Escolhe o dia! 📅');return}if(!selTime){alert('Escolhe o horário! 🕐');return}nextScreen(4)}
+
+function selectPlace(el,n){document.querySelectorAll('.place-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selPlace=n;setTimeout(()=>nextScreen(5),500)}
+function selectPlaceCinema(el){document.querySelectorAll('.place-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');setTimeout(()=>openCinema(),300)}
+
+function openCinema(){
+  resetNo('no-btn');resetNo('no-btn2');
+  document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen4b').classList.add('active');renderCinema();
+}
+function backToPlaces(){document.getElementById('screen4b').classList.remove('active');cur=4;document.getElementById('screen4').classList.add('active');renderDots()}
+function switchTab(t){cTab=t;cFilter='Todos';document.getElementById('tab-cartaz').classList.toggle('active',t==='cartaz');document.getElementById('tab-breve').classList.toggle('active',t==='breve');renderCinema()}
+
+function ageCls(a){return a==='18'?'age-18':a==='16'?'age-16':a==='14'?'age-14':a==='12'?'age-12':a==='L'?'age-L':'age-Q'}
+
+function renderCinema(){
+  const filmes=cTab==='cartaz'?filmesCartaz:filmesEmBreve;
+  const genres=['Todos',...new Set(filmes.flatMap(f=>f.gen))];
+  const fc=document.getElementById('cinema-filters');fc.innerHTML='';
+  genres.forEach(g=>{const b=document.createElement('button');b.className='filter-chip'+(cFilter===g?' active':'');b.textContent=g;b.onclick=()=>{cFilter=g;renderCinema()};fc.appendChild(b)});
+  const list=document.getElementById('cinema-list');list.innerHTML='';
+  const filtered=cFilter==='Todos'?filmes:filmes.filter(f=>f.gen.includes(cFilter));
+  filtered.forEach(f=>{
+    const card=document.createElement('div');
+    card.className='movie-card'+(selFilme===f.nome?' selected':'');
+    card.onclick=()=>{document.querySelectorAll('.movie-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');selFilme=f.nome;document.getElementById('sel-film-name').textContent=f.nome};
+    const tagHtml=f.tag==='PRÉ-VENDA'?`<div class="movie-tag tag-prevenda">PRÉ-VENDA</div>`:f.estreia?`<div class="movie-tag tag-estreia">Estreia ${f.estreia}</div>`:'';
+    if(f.poster){
+      card.innerHTML=`<div class="movie-poster-wrap"><img class="movie-poster-img" src="${f.poster}" alt="${f.nome}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="movie-poster-fallback" style="display:none"><span>🎬</span><p>${f.nome}</p></div><div class="movie-age ${ageCls(f.age)}">${f.age==='?'?'?':f.age}</div>${tagHtml}</div><div class="movie-info"><div class="movie-name">${f.nome}</div></div>`;
+    } else {
+      card.innerHTML=`<div class="movie-poster-wrap"><div class="movie-poster-fallback"><span>🎬</span><p>${f.nome}</p></div><div class="movie-age ${ageCls(f.age)}">${f.age==='?'?'?':f.age}</div>${tagHtml}</div><div class="movie-info"><div class="movie-name">${f.nome}</div></div>`;
+    }
+    list.appendChild(card);
+  });
+}
+function confirmFilme(){if(!selFilme){alert('Escolhe um filme! 🎬');return}selPlace='🎬 Cinema – '+selFilme;document.getElementById('screen4b').classList.remove('active');cur=5;document.getElementById('screen5').classList.add('active');renderDots()}
+
+function selectNight(el,n){document.querySelectorAll('.night-card').forEach(c=>{c.style.borderColor='';c.style.background=''});el.style.borderColor='var(--rose)';el.style.background='rgba(232,50,90,.2)';selNight=n;confetti();setTimeout(()=>nextScreen(6),900)}
+
+function renderSum(){
+  document.getElementById('sum-date').textContent=selDate||'—';
+  document.getElementById('sum-time').textContent=selTime||'—';
+  document.getElementById('sum-place').textContent=selPlace||'—';
+  document.getElementById('sum-night').textContent=selNight||'—';
+  confetti();
+}
+
+function enviarWhatsApp(){
+  const msg=encodeURIComponent('💖 ELA DISSE SIM!\n\n📅 Data: '+(selDate||'—')+'\n🕐 Horário: '+(selTime||'—')+'\n📍 Lugar: '+(selPlace||'—')+'\n🌙 Depois: '+(selNight||'—')+'\n\n✨ Tá marcado! Mal posso esperar 🥂');
+  window.open('https://wa.me/5511916528370?text='+msg,'_blank');
+}
+
+function confetti(){
+  const cs=['#E8325A','#FF6B8A','#FFD6E0','#C9965A','#fff','#ff9dcf'];
+  for(let i=0;i<80;i++){const el=document.createElement('div');el.className='confetti-piece';el.style.left=Math.random()*100+'vw';el.style.background=cs[~~(Math.random()*cs.length)];el.style.animationDuration=(1.5+Math.random()*2.5)+'s';el.style.animationDelay=Math.random()+'s';el.style.width=(6+Math.random()*10)+'px';el.style.height=(6+Math.random()*10)+'px';el.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(el);setTimeout(()=>el.remove(),4000)}
+}
+</script>
+</body>
+</html>
